@@ -1,3 +1,5 @@
+using MaximTechnologyTasks.Services;
+
 namespace MaximTechnologyTasks
 {
     public class Program
@@ -12,6 +14,7 @@ namespace MaximTechnologyTasks
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddScoped<StringFormatService>();
 
             var app = builder.Build();
 
