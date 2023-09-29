@@ -4,10 +4,15 @@ namespace MaximTechnologyTasks.Services
 {
     public class StringFormatService
     {
-        public async Task<string> FormatStr (string origin)
+        public async Task<List<string>> FormatStr (string origin)
         {
+            List<string> serverResponse = new List<string>();
+
             if (origin == null)
-                return new string("");
+            {
+                serverResponse.Add(string.Empty);
+                return serverResponse;
+            }
 
 
             if (! await IsSmallLetters(origin))
@@ -21,38 +26,37 @@ namespace MaximTechnologyTasks.Services
                 }
 
                 //throw new Exception(message: "Incorrect input letters: " + sb.ToString());
-                return new string("Incorrect input letters: " +  sb.ToString());
+                serverResponse.Add("Incorrect input letters: " + sb.ToString());
+                return serverResponse;
             }
 
-
-            char[] result = new char[origin.Length];
 
             if (origin.Length % 2 == 0)
             {
-
-                for (int i = origin.Length / 2 - 1; i >= 0; i--)
-                    result[origin.Length / 2 - i - 1] = origin[i];
-
-                int k = origin.Length / 2;
-                for (int i = origin.Length - 1; i >= origin.Length / 2; i--)
-                {
-                    result[k] = origin[i];
-                    k++;
-                }
-
-                return new string(result);
+                serverResponse.Add(
+                    String.Concat(
+                    await ReverseString(String.Concat(origin.Take(origin.Length / 2))),
+                    await ReverseString(String.Concat(origin.TakeLast(origin.Length / 2)))
+                    ));
+            }
+            else
+            {
+                serverResponse.Add(String.Concat(await ReverseString(origin), origin));
             }
 
 
-            for (int i = origin.Length - 1; i >= 0; i--)
-                result[origin.Length - i - 1] = origin[i];
-
-            string res = String.Concat(new string(result), origin);
-
-            return res;
+            return serverResponse;
         }
 
         private async Task<bool> IsSmallLetters (string origin)
             => origin.All(x => (x >= 'a' && x <= 'z'));
+
+        private async Task<string> ReverseString (string origin)
+        {
+            char[] reversedString = new char[origin.Length];
+            for (int i = origin.Length - 1; i >= 0; i--)
+                reversedString[origin.Length - i - 1] = origin[i];
+            return new string(reversedString);
+        }
     }
 }

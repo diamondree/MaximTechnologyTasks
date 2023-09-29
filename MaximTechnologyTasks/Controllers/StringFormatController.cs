@@ -15,7 +15,7 @@ namespace MaximTechnologyTasks.Controllers
         }
 
         [HttpGet]
-        public async Task<string> FormatStr(string origin)
+        public async Task<List<string>> FormatStr(string origin)
             => await _formatService.FormatStr(origin);
     }
 }
