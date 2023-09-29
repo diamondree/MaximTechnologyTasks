@@ -1,4 +1,6 @@
-﻿namespace MaximTechnologyTasks.Services
+﻿using System.Text;
+
+namespace MaximTechnologyTasks.Services
 {
     public class StringFormatService
     {
@@ -6,6 +8,22 @@
         {
             if (origin == null)
                 return new string("");
+
+
+            if (! await IsSmallLetters(origin))
+            {
+                StringBuilder sb = new StringBuilder();
+
+                foreach (char c in origin)
+                {
+                    if (!(c >= 'a' && c <= 'z'))
+                        sb.Append(c);
+                }
+
+                //throw new Exception(message: "Incorrect input letters: " + sb.ToString());
+                return new string("Incorrect input letters: " +  sb.ToString());
+            }
+
 
             char[] result = new char[origin.Length];
 
@@ -33,5 +51,8 @@
 
             return res;
         }
+
+        private async Task<bool> IsSmallLetters (string origin)
+            => origin.All(x => (x >= 'a' && x <= 'z'));
     }
 }
