@@ -44,12 +44,20 @@ namespace MaximTechnologyTasks.Services
                 serverResponse.Add(String.Concat(await ReverseString(origin), origin));
             }
 
+            
+
+            foreach (var note in await GetCharsCountInString(serverResponse[0]))
+            {
+                serverResponse.Add($"Digit '{note.Key}' is contained in the processed string {note.Value} times");
+            }
 
             return serverResponse;
         }
 
+
         private async Task<bool> IsSmallLetters (string origin)
             => origin.All(x => (x >= 'a' && x <= 'z'));
+
 
         private async Task<string> ReverseString (string origin)
         {
@@ -58,5 +66,26 @@ namespace MaximTechnologyTasks.Services
                 reversedString[origin.Length - i - 1] = origin[i];
             return new string(reversedString);
         }
+
+
+        private async Task<Dictionary<char, int>> GetCharsCountInString (string reversedString)
+        {
+            Dictionary<char, int> charsCount = new Dictionary<char, int>();
+
+            foreach (char c in reversedString)
+            {
+                if (!charsCount.ContainsKey(c))
+                {
+                    charsCount.Add(c, 1);
+                }
+                else
+                {
+                    charsCount[c]++;
+                }
+            }
+
+            return charsCount;
+        }
+
     }
 }
