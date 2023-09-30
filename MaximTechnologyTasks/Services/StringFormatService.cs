@@ -6,8 +6,10 @@ namespace MaximTechnologyTasks.Services
 {
     public class StringFormatService
     {
-        public async Task<IResultResponse> FormatStr (string origin)
+        public async Task<IResultResponse> FormatStr (InputModel model)
         {
+            string origin = model.Origin;
+
             if (origin == null)
             {
                 ServerErrorModel errorResponse = new ServerErrorModel();
@@ -77,6 +79,12 @@ namespace MaximTechnologyTasks.Services
 
             // add longest substring starting and ending with any of "aeiouy"
             response.LongestSubstring = await GetLongestSubstring(response.ProcessedString);
+
+
+            // Sort string with required method
+            if (model.FormatMethod == "Quicksort")
+                response.SortedInvertedString = new string(SortService.QuickSort(response.ProcessedString.ToCharArray()));
+
 
 
             return response;
