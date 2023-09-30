@@ -15,6 +15,7 @@ namespace MaximTechnologyTasks.Services
             }
 
 
+            // checking for compliance with the condition
             if (! await IsSmallLetters(origin))
             {
                 StringBuilder sb = new StringBuilder();
@@ -31,6 +32,7 @@ namespace MaximTechnologyTasks.Services
             }
 
 
+            // modify string with an even number of chars
             if (origin.Length % 2 == 0)
             {
                 serverResponse.Add(
@@ -39,17 +41,23 @@ namespace MaximTechnologyTasks.Services
                     await ReverseString(String.Concat(origin.TakeLast(origin.Length / 2)))
                     ));
             }
+            // modify string with an odd number of chars
             else
             {
                 serverResponse.Add(String.Concat(await ReverseString(origin), origin));
             }
 
             
-
+            // adding chars count to server response
             foreach (var note in await GetCharsCountInString(serverResponse[0]))
             {
                 serverResponse.Add($"Digit '{note.Key}' is contained in the processed string {note.Value} times");
             }
+
+
+            // add longest substring starting and ending with any of "aeiouy"
+            serverResponse.Add(await GetLongestSubstring(serverResponse[0]));
+
 
             return serverResponse;
         }
@@ -85,6 +93,27 @@ namespace MaximTechnologyTasks.Services
             }
 
             return charsCount;
+        }
+
+
+        private async Task<string> GetLongestSubstring (string reversedString)
+        {
+            char[] symbols = { 'a', 'e', 'i', 'o', 'u', 'y' };
+
+            var symbolsCount = reversedString.Count(x => symbols.Contains(x));
+
+
+            if (symbolsCount == 0)
+                return ("String doesn`t contain substring");
+
+
+            else if (symbolsCount == 1)
+                return ($"The longest substring is: {reversedString.FirstOrDefault(c => symbols.Contains(c))}");
+            
+
+            int firstSymbolPos = reversedString.IndexOfAny(symbols);
+
+            return (reversedString.Substring(firstSymbolPos, reversedString.LastIndexOfAny(symbols) - firstSymbolPos + 1));
         }
 
     }
