@@ -1,17 +1,27 @@
-﻿using System.Text;
+﻿using MaximTechnologyTasks.Interfaces;
+using MaximTechnologyTasks.Models;
+using System.Text;
 
 namespace MaximTechnologyTasks.Services
 {
     public class StringFormatService
     {
-        public async Task<List<string>> FormatStr (string origin)
+        public async Task<IResultResponse> FormatStr (string origin)
         {
-            List<string> serverResponse = new List<string>();
-
             if (origin == null)
             {
-                serverResponse.Add(string.Empty);
-                return serverResponse;
+                ServerErrorModel errorResponse = new ServerErrorModel();
+                List<ErrorModel> errors = new List<ErrorModel>
+                {
+                    new ErrorModel
+                    {
+                        Code = 1,
+                        Message = "Empty input"
+                    }
+                };
+                errorResponse.Errors = errors;
+
+                return errorResponse;
             }
 
 
@@ -27,39 +37,49 @@ namespace MaximTechnologyTasks.Services
                 }
 
                 //throw new Exception(message: "Incorrect input letters: " + sb.ToString());
-                serverResponse.Add("Incorrect input letters: " + sb.ToString());
-                return serverResponse;
+                ServerErrorModel errorResponse = new ServerErrorModel();
+                List<ErrorModel> errors = new List<ErrorModel>
+                {
+                    new ErrorModel
+                    {
+                        Code = 2,
+                        Message = $"Incorrect input letters: '{sb}'"
+                    }
+                };
+                errorResponse.Errors = errors;
+                
+                return errorResponse;
             }
+
+
+            ServerResponseModel response = new ServerResponseModel();
 
 
             // modify string with an even number of chars
             if (origin.Length % 2 == 0)
             {
-                serverResponse.Add(
-                    String.Concat(
+                response.ProcessedString = String.Concat(
                     await ReverseString(String.Concat(origin.Take(origin.Length / 2))),
                     await ReverseString(String.Concat(origin.TakeLast(origin.Length / 2)))
-                    ));
+                    );
+                    
             }
             // modify string with an odd number of chars
             else
             {
-                serverResponse.Add(String.Concat(await ReverseString(origin), origin));
+                response.ProcessedString = String.Concat(await ReverseString(origin), origin);
             }
 
-            
-            // adding chars count to server response
-            foreach (var note in await GetCharsCountInString(serverResponse[0]))
-            {
-                serverResponse.Add($"Digit '{note.Key}' is contained in the processed string {note.Value} times");
-            }
+
+            // adding chars count to server response            
+            response.CharsContent = await GetCharsCountInString(response.ProcessedString);
 
 
             // add longest substring starting and ending with any of "aeiouy"
-            serverResponse.Add(await GetLongestSubstring(serverResponse[0]));
+            response.LongestSubstring = await GetLongestSubstring(response.ProcessedString);
 
 
-            return serverResponse;
+            return response;
         }
 
 
@@ -104,11 +124,11 @@ namespace MaximTechnologyTasks.Services
 
 
             if (symbolsCount == 0)
-                return ("String doesn`t contain substring");
+                return null;
 
 
             else if (symbolsCount == 1)
-                return ($"The longest substring is: {reversedString.FirstOrDefault(c => symbols.Contains(c))}");
+                return ($"{reversedString.FirstOrDefault(c => symbols.Contains(c))}");
             
 
             int firstSymbolPos = reversedString.IndexOfAny(symbols);

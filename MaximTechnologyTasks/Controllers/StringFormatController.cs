@@ -1,4 +1,5 @@
-﻿using MaximTechnologyTasks.Services;
+﻿using MaximTechnologyTasks.Interfaces;
+using MaximTechnologyTasks.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MaximTechnologyTasks.Controllers
@@ -15,7 +16,7 @@ namespace MaximTechnologyTasks.Controllers
         }
 
         [HttpGet]
-        public async Task<List<string>> FormatStr(string origin)
+        public async Task<IResultResponse> FormatStr(string origin)
             => await _formatService.FormatStr(origin);
     }
 }
