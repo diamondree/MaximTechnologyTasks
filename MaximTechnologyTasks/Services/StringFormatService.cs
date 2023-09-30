@@ -82,9 +82,12 @@ namespace MaximTechnologyTasks.Services
 
 
             // Sort string with required method
-            if (model.FormatMethod == "Quicksort")
+            if (model.FormatMethod.ToLower() == "quicksort")
                 response.SortedInvertedString = new string(SortService.QuickSort(response.ProcessedString.ToCharArray()));
 
+            if(model.FormatMethod.ToLower() == "treesort" || model.FormatMethod.ToLower() == "tree sort")
+                response.SortedInvertedString = new string(SortService.TreeSort(response.ProcessedString.ToCharArray()));
+            
 
 
             return response;

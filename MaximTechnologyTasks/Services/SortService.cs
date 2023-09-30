@@ -45,5 +45,84 @@
             array[i] = array[j];
             array[j] = temp;
         }
+
+
+        public static char[] TreeSort(char[] arr)
+        {
+            int[] array = Array.ConvertAll(arr, x => (int)x);
+            var treeNode = new TreeNode(array[0]);
+            for (int i = 1; i < array.Length; i++)
+            {
+                treeNode.Insert(new TreeNode(array[i]));
+            }
+
+            return Array.ConvertAll(treeNode.Transform(), x => (char)x);
+        }
+
+
+
+        private class TreeNode
+        {
+            public int Value { get; set; }
+            public TreeNode Left { get; set; }
+            public TreeNode Right { get; set; }
+
+            public TreeNode(int data)
+            {
+                Value = data;
+            }
+
+            
+            public void Insert(TreeNode node)
+            {
+                if (node.Value < Value)
+                {
+                    if (Left == null)
+                    {
+                        Left = node;
+                    }
+                    else
+                    {
+                        Left.Insert(node);
+                    }
+                }
+                else
+                {
+                    if (Right == null)
+                    {
+                        Right = node;
+                    }
+                    else
+                    {
+                        Right.Insert(node);
+                    }
+                }
+            }
+
+            
+            public int[] Transform(List<int> elements = null)
+            {
+                if (elements == null)
+                {
+                    elements = new List<int>();
+                }
+
+                if (Left != null)
+                {
+                    Left.Transform(elements);
+                }
+
+                elements.Add(Value);
+
+                if (Right != null)
+                {
+                    Right.Transform(elements);
+                }
+
+                return elements.ToArray();
+            }
+        }
     }
+
+    
 }
