@@ -1,30 +1,13 @@
-﻿using MaximTechnologyTasks.Interfaces;
-using MaximTechnologyTasks.Models;
+﻿using MaximTechnologyTasks.Models;
 using System.Text;
 
 namespace MaximTechnologyTasks.Services
 {
     public class StringFormatService
     {
-        public async Task<IResultResponse> FormatStr (InputModel model)
+        public async Task<ServerResponseModel> FormatStr (InputModel model)
         {
-            string origin = model.Origin;
-
-            if (origin == null)
-            {
-                ServerErrorModel errorResponse = new ServerErrorModel();
-                List<ErrorModel> errors = new List<ErrorModel>
-                {
-                    new ErrorModel
-                    {
-                        Code = 1,
-                        Message = "Empty input"
-                    }
-                };
-                errorResponse.Errors = errors;
-
-                return errorResponse;
-            }
+            string origin = model.Origin ?? throw new Exception(message: "Empty input");
 
 
             // checking for compliance with the condition
@@ -38,39 +21,14 @@ namespace MaximTechnologyTasks.Services
                         sb.Append(c);
                 }
 
-                //throw new Exception(message: "Incorrect input letters: " + sb.ToString());
-                ServerErrorModel errorResponse = new ServerErrorModel();
-                List<ErrorModel> errors = new List<ErrorModel>
-                {
-                    new ErrorModel
-                    {
-                        Code = 2,
-                        Message = $"Incorrect input letters: '{sb}'"
-                    }
-                };
-                errorResponse.Errors = errors;
-                
-                return errorResponse;
+                throw new Exception(message: "Incorrect input letters: " + sb.ToString());
             }
 
 
             ServerResponseModel response = new ServerResponseModel();
 
-
-            // modify string with an even number of chars
-            if (origin.Length % 2 == 0)
-            {
-                response.ProcessedString = String.Concat(
-                    await ReverseString(String.Concat(origin.Take(origin.Length / 2))),
-                    await ReverseString(String.Concat(origin.TakeLast(origin.Length / 2)))
-                    );
-                    
-            }
-            // modify string with an odd number of chars
-            else
-            {
-                response.ProcessedString = String.Concat(await ReverseString(origin), origin);
-            }
+            //reform string
+            response.ProcessedString = await ReformString(origin);
 
 
             // adding chars count to server response            
@@ -82,10 +40,10 @@ namespace MaximTechnologyTasks.Services
 
 
             // Sort string with required method
-            if (model.FormatMethod.ToLower() == "quicksort")
+            if (model.SortMethod.ToLower() == "quicksort")
                 response.SortedInvertedString = new string(SortService.QuickSort(response.ProcessedString.ToCharArray()));
 
-            if(model.FormatMethod.ToLower() == "treesort" || model.FormatMethod.ToLower() == "tree sort")
+            if(model.SortMethod.ToLower() == "treesort" || model.SortMethod.ToLower() == "tree sort")
                 response.SortedInvertedString = new string(SortService.TreeSort(response.ProcessedString.ToCharArray()));
 
 
@@ -98,6 +56,19 @@ namespace MaximTechnologyTasks.Services
 
         private async Task<bool> IsSmallLetters (string origin)
             => origin.All(x => (x >= 'a' && x <= 'z'));
+
+
+        private async Task<string> ReformString (string origin)
+        {
+            if (origin.Length % 2 == 0)
+            
+                return String.Concat(
+                    await ReverseString(String.Concat(origin.Take(origin.Length / 2))),
+                    await ReverseString(String.Concat(origin.TakeLast(origin.Length / 2)))
+                    );
+            else
+                return String.Concat(await ReverseString(origin), origin);
+        }
 
 
         private async Task<string> ReverseString (string origin)
