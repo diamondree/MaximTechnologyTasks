@@ -87,8 +87,10 @@ namespace MaximTechnologyTasks.Services
 
             if(model.FormatMethod.ToLower() == "treesort" || model.FormatMethod.ToLower() == "tree sort")
                 response.SortedInvertedString = new string(SortService.TreeSort(response.ProcessedString.ToCharArray()));
-            
 
+
+            // Delete char from a position recieved from remote API randon number generator
+            response.ProcessedStringWithoutChar = response.ProcessedString.Remove(await GetRandomInt(response.ProcessedString.Length - 1), 1);
 
             return response;
         }
@@ -145,6 +147,30 @@ namespace MaximTechnologyTasks.Services
             int firstSymbolPos = reversedString.IndexOfAny(symbols);
 
             return (reversedString.Substring(firstSymbolPos, reversedString.LastIndexOfAny(symbols) - firstSymbolPos + 1));
+        }
+
+
+        private async Task<int> GetRandomInt (int reversedStringLength)
+        {
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri($"https://www.random.org/integers/?num=1&min=0&max={reversedStringLength}&col=1&base=10&format=plain&rnd=new");
+                using (HttpResponseMessage response = await client.GetAsync(client.BaseAddress))
+                {
+                    try
+                    {
+                        response.EnsureSuccessStatusCode();
+                        string responseBody = await response.Content.ReadAsStringAsync();
+                        return Convert.ToInt32(responseBody);
+                    }
+                    catch (HttpRequestException ex)
+                    {
+                        Random rnd = new Random();
+                        Console.WriteLine(ex.Message);
+                        return rnd.Next(reversedStringLength);
+                    }
+                }
+            }
         }
 
     }
