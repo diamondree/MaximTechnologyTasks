@@ -1,3 +1,4 @@
+using MaximTechnologyTasks.Configs;
 using MaximTechnologyTasks.Services;
 
 namespace MaximTechnologyTasks
@@ -15,6 +16,8 @@ namespace MaximTechnologyTasks
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<StringFormatService>();
+            var section = builder.Configuration.GetSection("Settings");
+            builder.Services.Configure<StringFormatServiceSettings>(section);
 
             var app = builder.Build();
 

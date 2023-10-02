@@ -1,10 +1,19 @@
-﻿using MaximTechnologyTasks.Models;
+﻿using MaximTechnologyTasks.Configs;
+using MaximTechnologyTasks.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.Text;
 
 namespace MaximTechnologyTasks.Services
 {
     public class StringFormatService
     {
+        private readonly IOptions<StringFormatServiceSettings> _settings;
+        public StringFormatService(IOptions<StringFormatServiceSettings> settings) 
+        {
+            _settings = settings;
+        }
+
         public async Task<ServerResponseModel> FormatStr (InputModel model)
         {
             string origin = model.Origin ?? throw new Exception(message: "Empty input");
@@ -23,6 +32,13 @@ namespace MaximTechnologyTasks.Services
 
                 throw new Exception(message: "Incorrect input letters: " + sb.ToString());
             }
+
+            
+            // check origin string similar to string in black list
+            if (_settings.Value.BlackList != null)
+                if (_settings.Value.BlackList.Contains(origin))
+                    throw new Exception(message: "Input string is in black list");
+                
 
 
             ServerResponseModel response = new ServerResponseModel();
@@ -125,7 +141,7 @@ namespace MaximTechnologyTasks.Services
         {
             using (var client = new HttpClient())
             {
-                client.BaseAddress = new Uri($"https://www.random.org/integers/?num=1&min=0&max={reversedStringLength}&col=1&base=10&format=plain&rnd=new");
+                client.BaseAddress = new Uri($"{_settings.Value.RandomApi}num=1&min=0&max={reversedStringLength}&col=1&base=10&format=plain&rnd=new");
                 using (HttpResponseMessage response = await client.GetAsync(client.BaseAddress))
                 {
                     try
