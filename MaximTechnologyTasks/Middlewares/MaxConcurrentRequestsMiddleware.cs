@@ -1,5 +1,6 @@
 ﻿using MaximTechnologyTasks.Configs;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Options;
 
 namespace MaximTechnologyTasks.Middlewares
 {
@@ -8,12 +9,13 @@ namespace MaximTechnologyTasks.Middlewares
         private int _concurrentRequestsCount;
 
         private readonly RequestDelegate _next;
-        //private readonly ConcurrentReqestsSetting _options;
+        private readonly ConcurrentReqestsSetting _options;
 
-        public MaxConcurrentRequestsMiddleware(RequestDelegate next)
+        public MaxConcurrentRequestsMiddleware(RequestDelegate next, ConcurrentReqestsSetting options)
         {
             _concurrentRequestsCount = 0;
             _next = next;
+            _options = options;
         }
 
         public async Task Invoke(HttpContext context)
@@ -42,7 +44,7 @@ namespace MaximTechnologyTasks.Middlewares
                 limitExceeded = true;
 
                 initialConcurrentRequestsCount = _concurrentRequestsCount;
-                if (initialConcurrentRequestsCount >= 10)
+                if (initialConcurrentRequestsCount >= _options.ConcurrentRequestsLimit)
                 {
                     break;
                 }

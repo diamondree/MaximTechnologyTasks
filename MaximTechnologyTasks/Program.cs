@@ -28,7 +28,9 @@ namespace MaximTechnologyTasks
                 app.UseSwaggerUI();
             }
 
-            app.UseMiddleware<MaxConcurrentRequestsMiddleware>();
+            app.UseMiddleware<MaxConcurrentRequestsMiddleware>(builder.Configuration.Get<ConcurrentReqestsSetting>());
+
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
