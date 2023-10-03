@@ -1,6 +1,6 @@
 using MaximTechnologyTasks.Configs;
 using MaximTechnologyTasks.Services;
-
+using MaximTechnologyTasks.Middlewares;
 namespace MaximTechnologyTasks
 {
     public class Program
@@ -8,7 +8,7 @@ namespace MaximTechnologyTasks
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -28,6 +28,7 @@ namespace MaximTechnologyTasks
                 app.UseSwaggerUI();
             }
 
+            app.UseMiddleware<MaxConcurrentRequestsMiddleware>();
             app.UseHttpsRedirection();
 
             app.UseAuthorization();

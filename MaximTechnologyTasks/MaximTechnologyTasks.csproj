@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="System.Threading.RateLimiting" Version="8.0.0-rc.1.23419.4" />
   </ItemGroup>
 
 </Project>
