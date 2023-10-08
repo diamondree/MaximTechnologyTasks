@@ -1,6 +1,6 @@
 ﻿namespace MaximTechnologyTasks.Services
 {   //for task 5
-    internal class SortService
+    public class SortService
     {
         public static char[] QuickSort(char[] array)
         {

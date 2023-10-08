@@ -1,6 +1,6 @@
 ﻿using MaximTechnologyTasks.Configs;
 using MaximTechnologyTasks.Models;
-using Microsoft.Extensions.Configuration;
+using MaximTechnologyTasks.Utils;
 using Microsoft.Extensions.Options;
 using System.Text;
 
@@ -9,6 +9,7 @@ namespace MaximTechnologyTasks.Services
     public class StringFormatService
     {
         private readonly IOptions<StringFormatServiceSettings> _settings;
+
         public StringFormatService(IOptions<StringFormatServiceSettings> settings) 
         {
             _settings = settings;
@@ -19,19 +20,8 @@ namespace MaximTechnologyTasks.Services
             string origin = model.Origin ?? throw new Exception(message: "Empty input");
 
 
-            // checking for compliance with the condition    
-            if (! await IsSmallLetters(origin))
-            {
-                StringBuilder sb = new StringBuilder();
-
-                foreach (char c in origin)
-                {
-                    if (!(c >= 'a' && c <= 'z'))
-                        sb.Append(c);
-                }
-
-                throw new Exception(message: "Incorrect input letters: " + sb.ToString());
-            }
+            // checking for compliance with the condition
+            await VerifyInputString(origin);
 
             
             // check origin string similar to string in black list
@@ -44,15 +34,15 @@ namespace MaximTechnologyTasks.Services
             ServerResponseModel response = new ServerResponseModel();
 
             //reform string
-            response.ProcessedString = await Utils.StringConversion.ReformString(origin);
+            response.ProcessedString = await StringConversion.ReformString(origin);
 
 
             // adding chars count to server response            
-            response.CharsContent = await Utils.StringConversion.GetCharsCountInString(response.ProcessedString);
+            response.CharsContent = await StringConversion.GetCharsCountInString(response.ProcessedString);
 
 
             // add longest substring starting and ending with any of "aeiouy"
-            response.LongestSubstring = await Utils.StringConversion.GetLongestSubstring(response.ProcessedString);
+            response.LongestSubstring = await StringConversion.GetLongestSubstring(response.ProcessedString);
 
 
             // Sort string with required method
@@ -69,6 +59,21 @@ namespace MaximTechnologyTasks.Services
             return response;
         }
 
+        public async Task VerifyInputString (string input)
+        {
+            if (!await IsSmallLetters(input))
+            {
+                StringBuilder sb = new StringBuilder();
+
+                foreach (char c in input)
+                {
+                    if (!(c >= 'a' && c <= 'z'))
+                        sb.Append(c);
+                }
+
+                throw new Exception(message: "Incorrect input letters: " + sb.ToString());
+            }
+        }
 
         private async Task<bool> IsSmallLetters (string origin)
             => origin.All(x => (x >= 'a' && x <= 'z'));

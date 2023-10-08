@@ -4,7 +4,7 @@ using System.Runtime;
 
 namespace MaximTechnologyTasks.Utils
 {
-    public class StringConversion
+    public static class StringConversion
     {
         public static async Task<string> ReformString(string origin)
         {
